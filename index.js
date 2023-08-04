@@ -211,15 +211,20 @@ console.log(findEvenNumber([1, 4, 5]));
  *  user - Об'єкт користувача для перевірки.
  */
 function validateUser(user) {
-	if (!user) {
-		throw Error("Об'єкт користувача не вказано!");
-	  } else if (!user.name) {
-		throw Error("Ім'я користувача не вказано!");
-	  } else if (!user.email) {
-		throw Error("Email користувача не вказано!");
-	  } else {
+	try {
+		if (!user) {
+		  throw new Error("Об'єкт користувача не вказано!");
+		}
+		if (!user.name) {
+		  throw new Error("Ім'я користувача не вказано!", { cause: user });
+		}	
+		if (!user.email) {
+		  throw new Error("Email користувача не вказано!", { cause: user });
+		}	
 		console.log("Об'єкт користувача відповідає всім вимогам.");
-	}
+	  } catch (error) {		
+		console.error(error.message, error.cause);
+	  }
   // Перевіряємо, чи існує об'єкт користувача,якщо ні викидуємо помилку з повідомленням "Об'єкт користувача не вказано!".
   // Перевіряємо, чи існує ім'я користувача,якщо ні викидуємо помилку з повідомленням "Ім'я користувача не вказано!", а як причину вказуємо об'єкт user.
   // Перевіряємо, чи існує email користувача,якщо ні викидуємо помилку з повідомленням "Email користувача не вказано!", а як причину вказуємо об'єкт user.
@@ -230,11 +235,7 @@ function validateUser(user) {
 console.log("Завдання: 7 ==============================");
 
 // Виклик функції з неповним об'єктом користувача.
-try {
-	validateUser({ name: "John Doe" });
-  } catch (error) {
-	console.log(error);
-  }
+validateUser({ name: "John Doe" });  
 // Виведе
 // Email користувача не вказано! { name: 'John Doe' }
 
@@ -247,12 +248,17 @@ try {
  *  number - Число для обчислення квадратного кореня.
  */
 function calculateSquareRoot(number) {
-	if (typeof number !== "number") {
-		return new TypeError("Аргумент має бути числом!")
-	} else if (number <= 0) {
-		return new RangeError("Число не повинно бути від'ємним!");
-	}
-	return Math.sqrt(number);
+	try {
+		if (typeof number !== "number") {
+		  throw new TypeError("Аргумент має бути числом!");
+		}	
+		if (number < 0) {
+		  throw new RangeError("Число не повинно бути від'ємним!");
+		}	
+		return Math.sqrt(number);
+	  } catch (error) {
+		return error.message;
+	  }
   // Перевіряємо, чи аргумент є числом, якщо ні викидуємо помилку про невірний тип даних з повідомленням Аргумент має бути числом!".
   // Перевіряємо, чи число не від'ємне, якщо ні викидуємо помилку про тип недопустимий діапазон з повідомленням Число не повинно бути від'ємним!".
   // Повертаємо корінь квадратний з вхідного значення
@@ -277,12 +283,18 @@ console.log(calculateSquareRoot("abc"));
  *  data - Масив чисел для обробки.
  */
 function processData(data) {
-	for (let i = 0; i < data.length; i++) {
-		if (typeof data[i] !== "number") {
-			console.error(new TypeError(`Елемент з індексом ${i} має бути числом!`));
-		}
+	try {
+		// Для кожного елемента в масиві
+		data.forEach((item, index) => {
+		  if (typeof item !== "number") {			
+			throw new TypeError(`Елемент з індексом ${index} має бути числом!`);
+		  }
+		});
+		return "Дані успішно оброблені";
+	  } catch (error) {
+		console.error(error.stack);
+		return error.message;
 	  }
-	return "Дані успішно оброблені";
   // Для кожного елемента в масиві
   // Перевіряємо, чи елемент є числом
   // Якщо елемент не є числом, кидаємо помилку невірного типу даних з повідомленням `Елемент з індексом ${index} має бути числом!`
